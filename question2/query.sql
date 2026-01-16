@@ -1,0 +1,24 @@
+SELECT
+    DQI.CATEGORY,
+    T."hour",
+    T."weekday",
+    COUNT(F.QUERYID) AS Total_Searches,
+    SUM(CASE WHEN F.CLICK = TRUE THEN 1 ELSE 0 END) AS Total_Clicks,
+    SUM(CASE WHEN F.CLICK = TRUE THEN 1 ELSE 0 END) * 100 / COUNT(F.QUERYID) AS CTR_Percentage
+FROM
+    AOL_SCHEMA.FACTS F
+JOIN
+    AOL_SCHEMA.TIMEDIM T ON F.TIMEID = T.ID
+JOIN
+    AOL_SCHEMA.DIGITAL_QUERY_IDS DQI ON F.QUERYID = DQI.QUERYID 
+WHERE
+    T."year" = '2006' 
+GROUP BY GROUPING SETS (
+    (DQI.CATEGORY),            
+    (DQI.CATEGORY, T."hour"),  
+    (DQI.CATEGORY, T."weekday") 
+)
+ORDER BY 
+    DQI.CATEGORY, 
+    T."hour", 
+    T."weekday";
